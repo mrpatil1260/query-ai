@@ -2,48 +2,71 @@ import os
 import streamlit as st
 
 from app.services.pdf_service import extract_text_from_pdf
+from app.services.chunk_service import chunk_text
+from app.services.embedding_service import embed_texts, embed_query
+from app.services.chroma_service import add_documents, search, reset_collection
+from app.services.llm_service import ask_llm
 
-UPLOAD_DIR = "data/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+st.set_page_config(page_title="AI Knowledge Assistant")
 
-st.set_page_config(
-    page_title="AI Knowledge Assistant",
-    page_icon="🤖",
-)
-
-st.title("🤖 AI Knowledge Assistant")
+st.title("📚 AI Knowledge Assistant")
 
 uploaded_file = st.file_uploader(
     "Upload a PDF",
     type=["pdf"]
 )
 
-if uploaded_file is not None:
-    save_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+if uploaded_file:
 
-    with open(save_path, "wb") as f:
+    upload_path = os.path.join(
+        "data",
+        "uploads",
+        uploaded_file.name
+    )
+
+    with open(upload_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    st.success("✅ PDF uploaded successfully!")
+    st.success("PDF uploaded successfully!")
 
-    extracted_text = extract_text_from_pdf(save_path)
-    from app.services.chunk_service import chunk_text
+    # Extract text
+    text = extract_text_from_pdf(upload_path)
 
-    chunks = chunk_text(extracted_text)
+    # Split into chunks
+    chunks = chunk_text(text)
 
-    st.subheader("Number of Chunks")
-    st.write(len(chunks))
+    # Create embeddings
+    embeddings = embed_texts(chunks)
 
-    st.subheader("First Chunk")
-    st.text_area(
-        "Chunk Preview",
-        chunks[0] if chunks else "",
-        height=300,
+    # Store in ChromaDB
+    ids = [f"chunk_{i}" for i in range(len(chunks))]
+
+    reset_collection()
+
+
+
+    add_documents(
+        ids=ids,
+        texts=chunks,
+        embeddings=embeddings
     )
 
-    st.subheader("Extracted Text Preview")
-    st.text_area(
-        "Content",
-        extracted_text[:5000],
-        height=300
-    )
+    st.success(f"Indexed {len(chunks)} chunks!")
+
+    question = st.text_input("Ask a question about the PDF")
+
+    if question:
+
+        query_embedding = embed_query(question)
+
+        results = search(query_embedding)
+
+        context = "\n".join(results["documents"][0])
+
+        answer = ask_llm(
+            context=context,
+            question=question
+        )
+
+        st.subheader("Answer")
+        st.write(answer)
