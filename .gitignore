@@ -4,7 +4,7 @@ __pycache__/
 .venv/
 venv/
 data/chroma_db/
-
+data/uploads/
 # Environment variables
 .env
 
@@ -18,5 +18,3 @@ data/chroma_db/
 # Streamlit
 .streamlit/secrets.toml
 
-ai-knowledge-assistant
-ai-knowledge-assistant.pub
