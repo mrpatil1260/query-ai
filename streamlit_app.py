@@ -24,6 +24,7 @@ from app.components.code_workspace import render_code_workspace
 from app.components.resume_workspace import render_resume_workspace
 from app.services.resume_analysis_service import analyze_resume
 from app.components.resume_dashboard import render_resume_dashboard
+from app.components.footer import render_footer
 # -------------------------
 # Page Config
 # -------------------------
@@ -56,18 +57,8 @@ if (
     st.session_state.get("document_count", 0) == 0
     and not st.session_state.get("chat_history")
 ):
-    st.info(
-        """
-👋 **Welcome to Query AI!**
-
-### 🚀 What you can do:
-- 📄 Chat with multiple PDF documents
-- 📝 Summarize and analyze text
-- 💻 Review and explain source code
-- 🎯 Compare your resume with a job description
-- 📊 Discover missing skills and ATS keywords
-- 🎤 Generate interview questions
-        """
+    st.caption(
+        "🚀 Upload documents, analyze text or code, or compare your resume with a job description to get started."
     )
 
 # -------------------------
@@ -84,7 +75,7 @@ documents_tab, text_tab, code_tab, resume_tab = st.tabs(
         "📄 Documents",
         "📝 Text",
         "💻 Code",
-        "🎯 Career Copilot",
+        "🎯 Resume Intelligence",
     ]
 )
 
@@ -266,9 +257,9 @@ with code_tab:
         st.write(response)
 
 with resume_tab:
-    st.markdown("## 🎯 AI Career Copilot")
+    st.markdown("## 🎯 Resume Intelligence")
     st.caption(
-        "Compare your resume against a target role and job description to identify skill gaps, ATS keywords, and interview preparation opportunities."
+        "Analyze your resume against a target role and job description to discover skill gaps, ATS keywords, strengths, and personalized interview preparation."
     )
     uploaded_resume, target_role, job_description, analyze_clicked = render_resume_workspace()
 
@@ -292,11 +283,13 @@ with resume_tab:
                     job_description=job_description,
                 )
 
-            st.success("✅ Analysis complete!")
-            st.info(
-                "This report combines deterministic skill matching with AI-powered recommendations to help you tailor your resume for your target role."
+            st.success("✅ Resume analysis completed successfully.")
+            st.caption(
+                "Results combine deterministic skill matching with AI-powered recommendations tailored to your target role."
             )
             render_resume_dashboard(result)
 
         except Exception as e:
             st.error(f"❌ Failed to analyze resume:\n\n{e}")
+
+render_footer()

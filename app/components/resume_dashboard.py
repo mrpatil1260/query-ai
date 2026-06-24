@@ -6,9 +6,9 @@ def render_resume_dashboard(result: dict):
     Render a structured Resume Review dashboard.
     """
 
-    st.success("✅ Resume analysis complete!")
 
-    st.title("📊 Resume Intelligence Dashboard")
+
+    st.subheader("📊 Resume Intelligence Dashboard")
 
     # -------------------------
     # Overall Match
@@ -37,11 +37,18 @@ def render_resume_dashboard(result: dict):
     else:
         match_badge = "🔴 Needs Improvement"
 
-    st.metric(
-        label="🎯 Overall Match",
-        value=overall_match,
-    )
-    st.success(match_badge)
+    st.markdown("### 🎯 Overall Assessment")
+
+    col_a, col_b = st.columns([2, 1])
+
+    with col_a:
+        st.metric(
+            label="Resume Match",
+            value=overall_match,
+        )
+
+    with col_b:
+        st.markdown(f"### {match_badge}")
 
     keywords = result.get(
         "ats_keywords",
@@ -68,7 +75,7 @@ def render_resume_dashboard(result: dict):
 
         if skills:
             for skill in skills:
-                st.success(f"✅ {skill}")
+                st.markdown(f"- **{skill}**")
         else:
             st.info("No skills detected.")
 
@@ -80,12 +87,9 @@ def render_resume_dashboard(result: dict):
 
         if missing:
             for skill in missing:
-                st.error(f"❌ {skill}")
+                st.markdown(f"- **{skill}**")
         else:
             st.success("No missing skills identified.")
-
-    st.divider()
-
     # -------------------------
     # ATS Keywords
     # -------------------------
@@ -93,19 +97,22 @@ def render_resume_dashboard(result: dict):
 
     if keywords:
         for keyword in keywords:
-            st.success(f"🔑 {keyword}")
+            st.markdown(f"- **{keyword}**")
     else:
         st.info("No keyword recommendations.")
-
-    st.divider()
 
     # -------------------------
     # Skill Gap Summary
     # -------------------------
     with st.expander("📈 Skill Gap Summary", expanded=True):
-        st.write(f"Matched Skills: {len(skills)}")
-        st.progress(min(len(skills) / max(len(skills) + len(missing), 1), 1.0))
-        st.write(f"Missing Skills: {len(missing)}")
+        match_ratio = len(skills) / max(len(skills) + len(missing), 1)
+        match_percentage = int(match_ratio * 100)
+
+        st.write(f"**Resume Match:** {match_percentage}%")
+        st.progress(match_ratio)
+
+        st.write(f"✅ Matched Skills: {len(skills)}")
+        st.write(f"❌ Missing Skills: {len(missing)}")
         if missing:
             st.warning("Focus on learning or highlighting the missing skills for a better match.")
         else:
