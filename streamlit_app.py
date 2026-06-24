@@ -11,173 +11,292 @@ from app.services.chroma_service import (
     reset_collection,
 )
 from app.services.llm_service import ask_llm
-
+from app.services.text_analysis_service import analyze_text
+from app.services.code_analysis_service import analyze_code
+from app.components.header import render_header
+from app.components.stats_cards import render_stats
+from app.components.sidebar import render_sidebar
+from app.components.chat import render_chat_history
+from app.components.uploader import render_uploader
+from app.components.actions import render_actions
+from app.components.text_workspace import render_text_workspace
+from app.components.code_workspace import render_code_workspace
+from app.components.resume_workspace import render_resume_workspace
+from app.services.resume_analysis_service import analyze_resume
+from app.components.resume_dashboard import render_resume_dashboard
 # -------------------------
 # Page Config
 # -------------------------
 st.set_page_config(
-    page_title="AI Knowledge Assistant",
-    page_icon="📚",
+    page_title="Query AI",
+    page_icon="🧠",
     layout="wide",
 )
-
-st.title("📚 AI Knowledge Assistant")
-st.caption("Upload a PDF and ask questions using AI-powered Retrieval-Augmented Generation (RAG).")
-
-# -------------------------
-# Sidebar
-# -------------------------
-st.sidebar.title("⚙️ Controls")
-
 # -------------------------
 # Session State
 # -------------------------
 if "indexed_file" not in st.session_state:
     st.session_state.indexed_file = None
-
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "document_count" not in st.session_state:
+    st.session_state.document_count = 0
+if "chunk_count" not in st.session_state:
+    st.session_state.chunk_count = 0
 
-# Clear chat button
-if st.sidebar.button("🗑️ Clear Chat"):
+render_header()
+
+render_stats(
+    documents=st.session_state.document_count,
+    chunks=st.session_state.chunk_count,
+    questions=len(st.session_state.chat_history),
+)
+
+if (
+    st.session_state.get("document_count", 0) == 0
+    and not st.session_state.get("chat_history")
+):
+    st.info(
+        """
+👋 **Welcome to Query AI!**
+
+### 🚀 What you can do:
+- 📄 Chat with multiple PDF documents
+- 📝 Summarize and analyze text
+- 💻 Review and explain source code
+- 🎯 Compare your resume with a job description
+- 📊 Discover missing skills and ATS keywords
+- 🎤 Generate interview questions
+        """
+    )
+
+# -------------------------
+# Sidebar
+# -------------------------
+if render_sidebar():
     st.session_state.chat_history = []
     st.rerun()
 
-# -------------------------
-# Upload PDF
-# -------------------------
-uploaded_file = st.file_uploader(
-    "Upload a PDF",
-    type=["pdf"],
+actions = render_actions()
+
+documents_tab, text_tab, code_tab, resume_tab = st.tabs(
+    [
+        "📄 Documents",
+        "📝 Text",
+        "💻 Code",
+        "🎯 Career Copilot",
+    ]
 )
 
-if uploaded_file is not None:
-    try:
-        os.makedirs("data/uploads", exist_ok=True)
+with documents_tab:
+    # -------------------------
+    # Upload PDF
+    # -------------------------
+    uploaded_files = render_uploader()
 
-        unique_filename = f"{uuid.uuid4()}_{uploaded_file.name}"
-
-        upload_path = os.path.join(
-            "data",
-            "uploads",
-            unique_filename,
-        )
-
-        with open(upload_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-        st.success("✅ PDF uploaded successfully!")
-
-        # Only process once for each uploaded file
-        if st.session_state.indexed_file != uploaded_file.name:
+    if uploaded_files:
+        try:
+            total_chunks = 0
+            processed_documents = 0
 
             with st.spinner("📄 Processing PDF and building vector database..."):
 
                 reset_collection()
 
-                text = extract_text_from_pdf(upload_path)
+                for uploaded_file in uploaded_files:
+                    os.makedirs("data/uploads", exist_ok=True)
 
-                if not text or not text.strip():
-                    st.error("❌ No readable text found in the uploaded PDF.")
-                    st.stop()
+                    unique_filename = f"{uuid.uuid4()}_{uploaded_file.name}"
 
-                chunks = chunk_text(text)
+                    upload_path = os.path.join(
+                        "data",
+                        "uploads",
+                        unique_filename,
+                    )
 
-                if not chunks:
-                    st.error("❌ Failed to generate text chunks.")
-                    st.stop()
+                    with open(upload_path, "wb") as f:
+                        f.write(uploaded_file.getbuffer())
 
-                embeddings = embed_texts(chunks)
+                    text = extract_text_from_pdf(upload_path)
 
-                ids = [
-                    f"chunk_{i}"
-                    for i in range(len(chunks))
-                ]
+                    if not text or not text.strip():
+                        st.error("❌ No readable text found in the uploaded PDF.")
+                        st.stop()
 
-                add_documents(
-                    ids=ids,
-                    texts=chunks,
-                    embeddings=embeddings,
-                )
+                    chunks = chunk_text(text)
 
-                st.session_state.indexed_file = uploaded_file.name
+                    if not chunks:
+                        st.error("❌ Failed to generate text chunks.")
+                        st.stop()
+
+                    embeddings = embed_texts(chunks)
+
+                    ids = [
+                        f"chunk_{i}"
+                        for i in range(len(chunks))
+                    ]
+
+                    add_documents(
+                        ids=ids,
+                        texts=chunks,
+                        embeddings=embeddings,
+                        source_name=uploaded_file.name,
+                    )
+
+                    processed_documents += 1
+                    total_chunks += len(chunks)
+
+                st.session_state.document_count = processed_documents
+                st.session_state.chunk_count = total_chunks
+                st.session_state.indexed_file = "MULTI_PDF_SESSION"
                 st.session_state.chat_history = []
 
-            st.success(f"✅ Indexed {len(chunks)} chunks successfully!")
+            st.success(f"✅ Indexed {processed_documents} document(s) with {total_chunks} chunks successfully!")
 
-        st.divider()
+            if actions["summarize"]:
 
-        question = st.text_input(
-            "💬 Ask a question about the uploaded PDF"
-        )
+                with st.spinner("📝 Generating summary..."):
 
-        if question:
-
-            with st.spinner("🤖 Thinking..."):
-
-                query_embedding = embed_query(question)
-
-                results = search(
-                    query_embedding=query_embedding,
-                    n_results=5,
-                )
-
-                documents = results.get("documents", [])
-
-                if (
-                    not documents
-                    or len(documents) == 0
-                    or len(documents[0]) == 0
-                ):
-                    st.warning(
-                        "No relevant information found."
+                    query_embedding = embed_query(
+                        "Give me a comprehensive summary of all uploaded documents."
                     )
 
-                else:
-
-                    context = "\n\n".join(documents[0])
-
-                    answer = ask_llm(
-                        context=context,
-                        question=question,
+                    results = search(
+                        query_embedding=query_embedding,
+                        n_results=10,
                     )
 
-                    st.session_state.chat_history.append(
-                        {
-                            "question": question,
-                            "answer": answer,
-                            "sources": documents[0],
-                        }
-                    )
+                    docs = results.get("documents", [])
 
-        # -------------------------
-        # Chat History
-        # -------------------------
-        if st.session_state.chat_history:
+                    if docs and docs[0]:
+                        context = "\n\n".join(docs[0])
+
+                        summary = ask_llm(
+                            context=context,
+                            question=(
+                                "Provide a concise but comprehensive summary of all uploaded documents."
+                            ),
+                        )
+
+                        st.subheader("📝 AI Summary")
+                        st.write(summary)
+                    else:
+                        st.warning("No documents available to summarize.")
 
             st.divider()
-            st.subheader("💬 Conversation")
 
-            for idx, chat in enumerate(
-                st.session_state.chat_history,
-                start=1,
-            ):
+            question = st.text_input(
+                "💬 Ask a question about the uploaded PDF"
+            )
 
-                st.markdown(f"### 🙋 Question {idx}")
-                st.write(chat["question"])
+            if question:
 
-                st.markdown(f"### 🤖 Answer {idx}")
-                st.write(chat["answer"])
+                with st.spinner("🤖 Thinking..."):
 
-                with st.expander("📚 View Source Chunks"):
-                    for i, source in enumerate(
-                        chat.get("sources", []),
-                        start=1,
+                    query_embedding = embed_query(question)
+
+                    results = search(
+                        query_embedding=query_embedding,
+                        n_results=5,
+                    )
+
+                    documents = results.get("documents", [])
+                    metadatas = results.get("metadatas", [])
+
+                    if (
+                        not documents
+                        or len(documents) == 0
+                        or len(documents[0]) == 0
                     ):
-                        st.markdown(f"**Chunk {i}**")
-                        st.write(source)
+                        st.warning(
+                            "No relevant information found."
+                        )
 
-    except Exception as e:
-        st.error(
-            f"❌ An unexpected error occurred:\n\n{e}"
+                    else:
+
+                        context = "\n\n".join(documents[0])
+
+                        answer = ask_llm(
+                            context=context,
+                            question=question,
+                        )
+
+                        st.session_state.chat_history.append(
+                            {
+                                "question": question,
+                                "answer": answer,
+                                "sources": documents[0],
+                                "metadata": (
+                                    metadatas[0]
+                                    if metadatas
+                                    else []
+                                ),
+                            }
+                        )
+
+            # -------------------------
+            # Chat History
+            # -------------------------
+            render_chat_history(st.session_state.chat_history)
+
+        except Exception as e:
+            st.error(
+                f"❌ An unexpected error occurred:\n\n{e}"
+            )
+
+with text_tab:
+    text_input, text_action = render_text_workspace()
+    if text_input and st.button("🚀 Run Text Analysis", key="text_analysis_button"):
+        response = analyze_text(
+            text=text_input,
+            action=text_action,
         )
+        st.subheader("🤖 Result")
+        st.write(response)
+
+with code_tab:
+    code, language, code_action = render_code_workspace()
+    if code and st.button("🚀 Analyze Code", key="code_analysis_button"):
+        response = analyze_code(
+            code=code,
+            language=language,
+            action=code_action,
+        )
+        st.subheader("🤖 Analysis")
+        st.write(response)
+
+with resume_tab:
+    st.markdown("## 🎯 AI Career Copilot")
+    st.caption(
+        "Compare your resume against a target role and job description to identify skill gaps, ATS keywords, and interview preparation opportunities."
+    )
+    uploaded_resume, target_role, job_description, analyze_clicked = render_resume_workspace()
+
+    if uploaded_resume and analyze_clicked:
+        try:
+            os.makedirs("data/uploads", exist_ok=True)
+
+            resume_path = os.path.join(
+                "data",
+                "uploads",
+                f"{uuid.uuid4()}_{uploaded_resume.name}",
+            )
+
+            with open(resume_path, "wb") as f:
+                f.write(uploaded_resume.getbuffer())
+
+            with st.spinner("📄 Analyzing resume..."):
+                result = analyze_resume(
+                    pdf_path=resume_path,
+                    target_role=target_role,
+                    job_description=job_description,
+                )
+
+            st.success("✅ Analysis complete!")
+            st.info(
+                "This report combines deterministic skill matching with AI-powered recommendations to help you tailor your resume for your target role."
+            )
+            render_resume_dashboard(result)
+
+        except Exception as e:
+            st.error(f"❌ Failed to analyze resume:\n\n{e}")

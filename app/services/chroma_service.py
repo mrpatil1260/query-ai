@@ -20,13 +20,13 @@ def reset_collection():
     return get_collection()
 
 
-def add_documents(ids, texts, embeddings):
+def add_documents(ids, texts, embeddings, source_name="uploaded_pdf"):
     collection = get_collection()
 
     metadatas = [
         {
             "chunk_index": i,
-            "source": "uploaded_pdf",
+            "source": source_name,
         }
         for i in range(len(texts))
     ]
@@ -45,4 +45,9 @@ def search(query_embedding, n_results=5):
     return collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results,
+        include=[
+            "documents",
+            "metadatas",
+            "distances",
+        ],
     )
