@@ -1,210 +1,208 @@
-# 🧠 Query AI
+🧠 Query AI
 
-Query AI is an AI-powered Document, Text, Code & Resume Intelligence Platform designed to help you extract insights, answer questions, analyze content, and generate summaries across various data types. Built with cutting-edge technologies, Query AI provides an intuitive interface to interact with your documents, text snippets, codebases, and resumes using natural language queries.
+Query AI is an AI-powered platform for document understanding, text analysis, and code intelligence. It provides a unified ChatGPT-style interface where users can upload documents, analyze text, inspect source code, and ask natural language questions powered by semantic search and large language models.
 
----
+⸻
 
-## 🚀 Features
+✨ Features
 
-### Document Intelligence
-- 📄 Upload PDF documents  
-- 🔍 Extract and process text from PDFs  
-- ✂️ Smart text chunking for efficient retrieval  
-- 🧠 Generate semantic embeddings for accurate search  
-- 🔎 Semantic search using vector similarity  
-- 🤖 AI-powered question answering and summarization  
-- 📚 View source chunks used for answers  
-- 💬 Session-based chat history  
+📄 Multi-Format Document Intelligence
 
-### Text Intelligence
-Perform advanced operations on plain text with these actions:  
-- Summarize text  
-- Extract key points  
-- Generate questions and answers  
-- Translate text  
-- Paraphrase content  
-- Sentiment analysis  
-- Text classification  
-- Named entity recognition (NER)  
+Upload one or more documents and interact with them conversationally.
 
-### Code Intelligence
-Analyze and interact with code snippets and repositories:  
-- Explain code functionality  
-- Generate code documentation  
-- Detect bugs and suggest fixes  
-- Refactor code snippets  
-- Translate code between languages  
-- Generate test cases  
-- Summarize code changes  
-- Answer code-related questions  
+Supported Formats
 
-### Resume Intelligence
-Tailored features for resume analysis and enhancement:  
-- Extract key skills and experience  
-- Summarize career highlights  
-- Suggest improvements and optimizations  
-- Match resumes to job descriptions  
-- Generate interview questions  
-- Analyze gaps and inconsistencies  
-- Score resume relevance  
-- Provide tailored career advice  
+* ✅ PDF (.pdf)
+* ✅ Microsoft Word (.docx)
+* ✅ Text (.txt)
+* ✅ Markdown (.md)
+* ✅ CSV (.csv)
 
----
+Capabilities
 
-## 🛠️ Tech Stack
+* Automatic text extraction
+* Smart document chunking
+* Semantic embeddings generation
+* Vector indexing with ChromaDB
+* AI-powered question answering
+* Multi-document understanding
+* Cross-document comparison
+* Source chunk references
 
-- **Language:** Python 3.12  
-- **Frontend:** Streamlit  
-- **Large Language Model:** Groq Llama 3.3 70B  
-- **Embeddings:** Sentence Transformers (all-MiniLM-L6-v2)  
-- **Vector Database:** ChromaDB  
-- **PDF Processing:** PyMuPDF  
-- **Text Chunking:** LangChain RecursiveCharacterTextSplitter  
-- **Environment Management:** python-dotenv  
+⸻
 
----
+💬 Unified Chat Interface
 
-## 📂 Project Structure
+Query AI provides a ChatGPT-style conversational experience.
 
-```
-ai-knowledge-assistant/
+* Ask questions naturally
+* Continue follow-up conversations
+* Maintain context across interactions
+* Automatically generate chat titles
+* Start new conversations with one click
+
+⸻
+
+📝 Text Intelligence
+
+Analyze any pasted text using AI.
+
+Supported actions include:
+
+* Summarization
+* Sentiment Analysis
+* Keyword Extraction
+* Question Answering
+
+⸻
+
+💻 Code Intelligence
+
+Paste source code and receive AI-powered insights.
+
+Supported actions include:
+
+* Explain Code
+* Find Bugs
+* Suggest Improvements
+* Generate Tests
+
+⸻
+
+🔍 Semantic Search
+
+Instead of keyword matching, Query AI retrieves information based on semantic meaning using vector embeddings, enabling more accurate and context-aware responses.
+
+⸻
+
+📚 Multi-Document Support
+
+Upload multiple documents in the same session and ask questions across all of them.
+
+For example:
+
+* Compare two resumes
+* Find differences between reports
+* Identify common topics
+* Ask questions requiring information from multiple files
+
+⸻
+
+🛠️ Tech Stack
+
+Category	Technology
+Language	Python
+Frontend	Streamlit
+LLM	Groq (Llama Models)
+Embeddings	Sentence Transformers (all-MiniLM-L6-v2)
+Vector Database	ChromaDB
+PDF Processing	PyMuPDF
+DOCX Processing	python-docx
+Data Processing	Pandas
+Text Chunking	LangChain RecursiveCharacterTextSplitter
+
+⸻
+
+📂 Project Structure
+
+query-ai/
 │
 ├── app/
-│   ├── api/
-│   ├── models/
+│   ├── components/
 │   ├── services/
-│   │   ├── pdf_service.py
-│   │   ├── chunk_service.py
-│   │   ├── embedding_service.py
-│   │   ├── chroma_service.py
-│   │   └── llm_service.py
-│   └── main.py
+│   ├── api/
+│   └── models/
 │
 ├── data/
 │   ├── uploads/
 │   └── chroma_db/
 │
-├── tests/
 ├── streamlit_app.py
 ├── requirements.txt
-├── .env.example
-├── .gitignore
-└── README.md
-```
+├── README.md
+└── .env
 
----
+⸻
 
-## ⚙️ Installation
+⚙️ Installation
 
-1. **Clone the repository**
-
-```bash
-git clone <your-github-repo-url>
-cd ai-knowledge-assistant
-```
-
-2. **Create a virtual environment**
-
-```bash
+git clone <your-repository-url>
+cd query-ai
 python -m venv .venv
-```
-
-3. **Activate the environment**
-
-- macOS / Linux
-
-```bash
+# macOS / Linux
 source .venv/bin/activate
-```
-
-- Windows
-
-```bash
+# Windows
 .venv\Scripts\activate
-```
-
-4. **Install dependencies**
-
-```bash
 pip install -r requirements.txt
-```
 
----
+⸻
 
-## 🔑 Environment Variables
+🔑 Environment Variables
 
-Create a `.env` file in the project root with the following content:
+Create a .env file:
 
-```
-GROQ_API_KEY=your_groq_api_key
-```
+GROQ_API_KEY=your_api_key_here
 
-Replace `your_groq_api_key` with your actual API key.
+⸻
 
----
+▶️ Run the Application
 
-## ▶️ Running the Application
-
-Start the Streamlit app with:
-
-```bash
 streamlit run streamlit_app.py
-```
 
-Then open your browser and navigate to:
+Then open:
 
-```
 http://localhost:8501
-```
 
----
+⸻
 
-## 🧠 How It Works
+🚀 Workflow
 
-1. Upload a document (PDF), text snippet, code, or resume.  
-2. Extract and preprocess content (text extraction, chunking, embedding).  
-3. Store embeddings in ChromaDB for efficient semantic search.  
-4. Enter your natural language query or select an action.  
-5. Retrieve relevant chunks or data based on semantic similarity.  
-6. Use Groq LLM to generate accurate, context-aware responses.  
-7. Display answers, summaries, or analyses along with source context.  
+1. Upload one or more supported documents.
+2. Documents are automatically processed and indexed.
+3. Ask questions in natural language.
+4. Query AI performs semantic retrieval using vector embeddings.
+5. The LLM generates context-aware responses.
+6. Continue the conversation with follow-up questions.
 
----
+You can also paste text or source code and use the built-in analysis features.
 
-## 💡 Use Cases
+⸻
 
-- Quickly summarize lengthy reports, contracts, or research papers.  
-- Extract actionable insights from meeting notes or emails.  
-- Analyze and document codebases or snippets.  
-- Improve resumes and prepare for interviews.  
-- Automate question answering for internal knowledge bases.  
-- Translate and paraphrase content for multilingual teams.  
-- Detect bugs and improve code quality with AI suggestions.  
-- Perform sentiment analysis and text classification on customer feedback.  
+💡 Example Use Cases
 
----
+* Resume analysis and comparison
+* Research paper exploration
+* Business document summarization
+* Technical documentation assistance
+* Code explanation and debugging
+* AI-powered text summarization
+* CSV data understanding
+* Knowledge base search
 
-## 📈 Future Roadmap
+⸻
 
-- Enhanced multi-document and multi-format support  
-- User authentication and personalized sessions  
-- Citation-aware and explainable AI answers  
-- REST API endpoints with FastAPI  
-- Cloud deployment and containerization (Docker, Kubernetes)  
-- Integration with external data sources and APIs  
-- Real-time collaboration features  
-- Advanced code intelligence with language-specific parsers  
+🌟 Highlights
 
----
+* ChatGPT-style interface
+* Multi-format document support
+* Multi-document reasoning
+* AI-powered text intelligence
+* AI-powered code intelligence
+* Semantic search with embeddings
+* ChromaDB vector storage
+* Source-aware responses
+* Clean and intuitive Streamlit UI
 
-## 📄 License
+⸻
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+📄 License
 
----
+This project is licensed under the MIT License.
 
-## 👨‍💻 Author
+⸻
+
+👨‍💻 Author
 
 Prasad Patil
 
-Built as a portfolio project to demonstrate practical skills in Python, Generative AI, Retrieval-Augmented Generation (RAG), vector databases, and LLM integration.
+Built as a portfolio project to demonstrate practical skills in Python, Generative AI, Retrieval-Augmented Generation (RAG), vector databases, semantic search, and LLM-powered applications.
