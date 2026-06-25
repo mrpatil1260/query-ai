@@ -64,8 +64,7 @@ if "current_chat_title" not in st.session_state:
 # Title / Header (minimal)
 # -------------------------
 st.title("Query AI 🧠")
-if not st.session_state.chat_history:
-    st.info("👋 Welcome! Upload a document, paste text, paste code, or ask me anything to get started.")
+
 
 # -------------------------
 # Sidebar handling
