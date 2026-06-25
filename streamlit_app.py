@@ -21,9 +21,6 @@ from app.components.uploader import render_uploader
 from app.components.actions import render_actions
 from app.components.text_workspace import render_text_workspace
 from app.components.code_workspace import render_code_workspace
-from app.components.resume_workspace import render_resume_workspace
-from app.services.resume_analysis_service import analyze_resume
-from app.components.resume_dashboard import render_resume_dashboard
 from app.components.footer import render_footer
 # -------------------------
 # Page Config
@@ -58,7 +55,7 @@ if (
     and not st.session_state.get("chat_history")
 ):
     st.caption(
-        "🚀 Upload documents, analyze text or code, or compare your resume with a job description to get started."
+        "🚀 Upload documents, analyze text, or review source code to get started."
     )
 
 # -------------------------
@@ -70,12 +67,11 @@ if render_sidebar():
 
 actions = render_actions()
 
-documents_tab, text_tab, code_tab, resume_tab = st.tabs(
+documents_tab, text_tab, code_tab = st.tabs(
     [
         "📄 Documents",
-        "📝 Text",
-        "💻 Code",
-        "🎯 Resume Intelligence",
+        "📝 Text Intelligence",
+        "💻 Code Intelligence",
     ]
 )
 
@@ -255,41 +251,5 @@ with code_tab:
         )
         st.subheader("🤖 Analysis")
         st.write(response)
-
-with resume_tab:
-    st.markdown("## 🎯 Resume Intelligence")
-    st.caption(
-        "Analyze your resume against a target role and job description to discover skill gaps, ATS keywords, strengths, and personalized interview preparation."
-    )
-    uploaded_resume, target_role, job_description, analyze_clicked = render_resume_workspace()
-
-    if uploaded_resume and analyze_clicked:
-        try:
-            os.makedirs("data/uploads", exist_ok=True)
-
-            resume_path = os.path.join(
-                "data",
-                "uploads",
-                f"{uuid.uuid4()}_{uploaded_resume.name}",
-            )
-
-            with open(resume_path, "wb") as f:
-                f.write(uploaded_resume.getbuffer())
-
-            with st.spinner("📄 Analyzing resume..."):
-                result = analyze_resume(
-                    pdf_path=resume_path,
-                    target_role=target_role,
-                    job_description=job_description,
-                )
-
-            st.success("✅ Resume analysis completed successfully.")
-            st.caption(
-                "Results combine deterministic skill matching with AI-powered recommendations tailored to your target role."
-            )
-            render_resume_dashboard(result)
-
-        except Exception as e:
-            st.error(f"❌ Failed to analyze resume:\n\n{e}")
 
 render_footer()
