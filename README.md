@@ -124,6 +124,39 @@ query-ai/
 
 ⸻
 
+User
+  │
+  ▼
+Streamlit UI
+  │
+  ▼
+Document Upload
+  │
+  ▼
+Text Extraction
+  │
+  ▼
+Chunking
+  │
+  ▼
+Embeddings
+  │
+  ▼
+ChromaDB
+  │
+  ▼
+Semantic Retrieval
+  │
+  ▼
+Groq Llama 3.3 70B
+  │
+  ▼
+Final Response
+
+
+⸻
+
+
 ⚙️ Installation
 
 git clone <your-repository-url>
