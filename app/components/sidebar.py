@@ -6,24 +6,22 @@ def render_sidebar():
 
     st.sidebar.markdown("---")
 
-    st.sidebar.subheader("Features")
+    st.sidebar.subheader("Capabilities")
 
     st.sidebar.markdown(
         """
-- 📄 Multi-document chat
-- 📝 Text intelligence
-- 💻 Code analysis
-- 🎯 Career Copilot
-- 📊 Skill gap analysis
-- 🔑 ATS recommendations
-- 🎤 Interview preparation
+- 📄 Chat with PDF documents
+- 🔍 Semantic document search
+- 📝 Text Intelligence
+- 💻 Code Intelligence
+- 🤖 AI-powered insights
 """
     )
 
     st.sidebar.markdown("---")
 
-    clear = st.sidebar.button("🗑️ Clear Chat")
+    clear = st.sidebar.button("🗑️ Clear Conversation")
 
-    st.sidebar.caption("Version 1.0")
+    st.sidebar.caption("Query AI • v1.0")
 
     return clear

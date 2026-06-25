@@ -7,14 +7,13 @@ def render_header():
     st.title("🧠 Query AI")
 
     st.caption(
-        "AI-powered Document, Code & Career Intelligence"
+        "AI-powered Document, Text & Code Intelligence"
     )
 
     st.markdown(
         """
-Chat with documents, analyze text, review source code, compare resumes
-with job descriptions, identify skill gaps, and prepare for interviews
-from one unified workspace.
+Chat with documents, analyze text, review source code, and gain intelligent
+insights from a unified AI-powered workspace.
 """
     )
 

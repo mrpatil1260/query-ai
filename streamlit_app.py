@@ -14,7 +14,6 @@ from app.services.llm_service import ask_llm
 from app.services.text_analysis_service import analyze_text
 from app.services.code_analysis_service import analyze_code
 from app.components.header import render_header
-from app.components.stats_cards import render_stats
 from app.components.sidebar import render_sidebar
 from app.components.chat import render_chat_history
 from app.components.uploader import render_uploader
@@ -44,11 +43,7 @@ if "chunk_count" not in st.session_state:
 
 render_header()
 
-render_stats(
-    documents=st.session_state.document_count,
-    chunks=st.session_state.chunk_count,
-    questions=len(st.session_state.chat_history),
-)
+
 
 if (
     st.session_state.get("document_count", 0) == 0
