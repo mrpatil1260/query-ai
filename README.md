@@ -2,7 +2,7 @@
 
 Query AI is an AI-powered platform for document understanding, text analysis, and code intelligence. It provides a unified ChatGPT-style interface where users can upload documents, analyze text, inspect source code, and ask natural language questions powered by semantic search and large language models.
 
-⸻
+
 
 ✨ Features
 
@@ -29,7 +29,7 @@ Capabilities
 * Cross-document comparison
 * Source chunk references
 
-⸻
+
 
 💬 Unified Chat Interface
 
@@ -41,7 +41,7 @@ Query AI provides a ChatGPT-style conversational experience.
 * Automatically generate chat titles
 * Start new conversations with one click
 
-⸻
+
 
 📝 Text Intelligence
 
@@ -54,7 +54,7 @@ Supported actions include:
 * Keyword Extraction
 * Question Answering
 
-⸻
+
 
 💻 Code Intelligence
 
@@ -67,13 +67,13 @@ Supported actions include:
 * Suggest Improvements
 * Generate Tests
 
-⸻
+
 
 🔍 Semantic Search
 
 Instead of keyword matching, Query AI retrieves information based on semantic meaning using vector embeddings, enabling more accurate and context-aware responses.
 
-⸻
+
 
 📚 Multi-Document Support
 
@@ -86,7 +86,7 @@ For example:
 * Identify common topics
 * Ask questions requiring information from multiple files
 
-⸻
+
 
 🛠️ Tech Stack
 
@@ -101,7 +101,7 @@ DOCX Processing	python-docx
 Data Processing	Pandas
 Text Chunking	LangChain RecursiveCharacterTextSplitter
 
-⸻
+
 
 📂 Project Structure
 
@@ -122,7 +122,7 @@ query-ai/
 ├── README.md
 └── .env
 
-⸻
+
 
 ⚙️ Installation
 
@@ -135,7 +135,7 @@ source .venv/bin/activate
 .venv\Scripts\activate
 pip install -r requirements.txt
 
-⸻
+
 
 🔑 Environment Variables
 
@@ -143,7 +143,7 @@ Create a .env file:
 
 GROQ_API_KEY=your_api_key_here
 
-⸻
+
 
 ▶️ Run the Application
 
@@ -153,7 +153,7 @@ Then open:
 
 http://localhost:8501
 
-⸻
+
 
 🚀 Workflow
 
@@ -166,7 +166,7 @@ http://localhost:8501
 
 You can also paste text or source code and use the built-in analysis features.
 
-⸻
+
 
 💡 Example Use Cases
 
@@ -179,7 +179,7 @@ You can also paste text or source code and use the built-in analysis features.
 * CSV data understanding
 * Knowledge base search
 
-⸻
+
 
 🌟 Highlights
 
@@ -193,13 +193,11 @@ You can also paste text or source code and use the built-in analysis features.
 * Source-aware responses
 * Clean and intuitive Streamlit UI
 
-⸻
 
 📄 License
 
 This project is licensed under the MIT License.
 
-⸻
 
 👨‍💻 Author
 
