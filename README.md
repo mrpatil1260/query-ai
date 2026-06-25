@@ -137,6 +137,26 @@ Potential future enhancements:
 * User authentication and persistent conversation history.
 * Evaluation pipeline for retrieval quality metrics.
 
+-------------
+
+## 🧪 Testing
+
+The project includes unit tests covering core RAG components:
+
+- ✅ Document chunking
+- ✅ Embedding generation
+- ✅ ChromaDB indexing and retrieval
+- ✅ Multi-format file extraction
+- ✅ Text analysis services
+- ✅ Code analysis services
+
+Run all tests:
+
+```bash
+pytest
+
+-------------
+
 📄 Multi-Format Document Intelligence
 
 Upload one or more documents and interact with them conversationally.
