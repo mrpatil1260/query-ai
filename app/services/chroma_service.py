@@ -39,12 +39,12 @@ def add_documents(ids, texts, embeddings, source_name="uploaded_pdf"):
     )
 
 
-def search(query_embedding, n_results=5):
+def search(query_embedding, n_results=10):
     collection = get_collection()
 
     return collection.query(
         query_embeddings=[query_embedding],
-        n_results=n_results,
+        n_results=max(n_results, 20),
         include=[
             "documents",
             "metadatas",

@@ -2,46 +2,40 @@ import streamlit as st
 
 
 def render_chat_history(chat_history):
-    """Render the conversation with source document names."""
+    """Render the conversation history with optional source references."""
 
     if not chat_history:
         st.info(
-            "👋 Upload one or more PDFs and ask your first question."
+            "👋 Welcome! Upload a document, paste text, paste code, or ask a question to get started."
         )
         return
 
-    st.subheader("💬 Conversation")
-
     for chat in chat_history:
+        question = chat.get("question", "")
+        answer = chat.get("answer") or "No response generated."
 
-        with st.chat_message("user"):
-            st.markdown(chat["question"])
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(question)
 
-        with st.chat_message("assistant"):
-            st.markdown(chat["answer"])
+        with st.chat_message("assistant", avatar="🧠"):
+            st.markdown(answer)
 
             sources = chat.get("sources", [])
             metadata = chat.get("metadata", [])
 
             if sources:
-                with st.expander("📚 Sources Used"):
+                st.caption("📚 Sources")
+                with st.expander("📚 View Sources"):
 
                     for i, source in enumerate(sources):
 
-                        source_name = "Unknown Document"
-
-                        if i < len(metadata):
-                            source_name = metadata[i].get(
-                                "source",
-                                "Unknown Document",
-                            )
+                        meta = metadata[i] if i < len(metadata) and isinstance(metadata[i], dict) else {}
+                        source_name = meta.get("source", "Unknown Document")
 
                         st.markdown(
-                            f"### 📄 {source_name}"
-                        )
-
-                        st.caption(
-                            f"Chunk {i + 1}"
+                            f"**📄 {source_name} • Reference {i + 1}**"
                         )
 
                         st.write(source)
+                        st.divider()
+        st.markdown("")

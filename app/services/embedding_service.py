@@ -12,15 +12,23 @@ def get_model():
 
 def embed_texts(texts):
     """
-    Convert a list of text chunks into embeddings.
+    Convert a list of text chunks into normalized embeddings.
     """
     model = get_model()
-    return model.encode(texts).tolist()
+    return model.encode(
+        texts,
+        normalize_embeddings=True,
+        show_progress_bar=False,
+    ).tolist()
 
 
 def embed_query(query):
     """
-    Convert a single query into an embedding.
+    Convert a user query into a normalized embedding.
     """
     model = get_model()
-    return model.encode(query).tolist()
+    return model.encode(
+        query,
+        normalize_embeddings=True,
+        show_progress_bar=False,
+    ).tolist()

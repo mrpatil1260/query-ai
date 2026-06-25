@@ -2,10 +2,5 @@ import streamlit as st
 
 
 def render_footer():
-    """Render a simple application footer."""
-
-    st.divider()
-
-    st.caption(
-        "🧠 Query AI • Built with Python, Streamlit, ChromaDB, Sentence Transformers & LLMs"
-    )
+    """Minimal footer."""
+    st.caption("Powered by Query AI")

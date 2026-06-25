@@ -3,17 +3,23 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 def chunk_text(text: str):
     """
-    Split text into overlapping chunks using LangChain.
+    Split text into semantically meaningful overlapping chunks
+    optimized for RAG question answering.
     """
+
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=100,
+        chunk_size=1000,
+        chunk_overlap=200,
         separators=[
             "\n\n",
             "\n",
             ". ",
+            "? ",
+            "! ",
+            "; ",
+            ", ",
             " ",
-            ""
+            "",
         ],
     )
 
