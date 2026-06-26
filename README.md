@@ -1,392 +1,232 @@
-🧠 Query AI
+<div align="center">
 
-Query AI is an AI-powered platform for document understanding, text analysis, and code intelligence. It provides a unified ChatGPT-style interface where users can upload documents, analyze text, inspect source code, and ask natural language questions powered by semantic search and large language models.
+# Query AI
 
-🌐 **Live Demo:** https://thequeryai.streamlit.app/  
-📂 **GitHub:** https://github.com/mrpatil1260/query-ai
+**RAG-powered document intelligence. Ask anything about your documents.**
 
-⸻
+Upload PDFs, Word docs, Markdown, or CSVs — then ask questions in plain English.
+Query AI retrieves semantically relevant content using vector embeddings and answers with Groq-powered LLaMA 3.3 70B.
 
-**System Architechture**
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://thequeryai.streamlit.app/)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)](LICENSE)
 
+[**Try the live demo →**](https://thequeryai.streamlit.app/)
+
+---
+
+<!-- Add a demo GIF here: ![Demo](assets/demo.gif) -->
+
+</div>
+
+---
+
+## What it does
+
+Query AI gives you a conversational interface for three types of analysis:
+
+**Document Intelligence** — Upload one or more files and ask questions across all of them. The system chunks, embeds, and indexes your content in ChromaDB, then retrieves semantically relevant passages to answer your query with source attribution.
+
+**Text Intelligence** — Paste any text and run instant summarization, sentiment analysis, keyword extraction, or Q&A.
+
+**Code Intelligence** — Paste source code and get explanations, bug detection, improvement suggestions, or generated test cases.
+
+---
+
+## Architecture
+
+```
                 ┌──────────────────────────┐
                 │     Streamlit Frontend   │
-                │  (User Interface & Chat) │
+                │  (Chat Interface & UI)   │
                 └─────────────┬────────────┘
                               │
                               ▼
                   ┌────────────────────────┐
-                  │ User Input Processing  │
-                  │ • Documents            │
-                  │ • Text                 │
-                  │ • Code                 │
+                  │   Input Processing     │
+                  │  Documents / Text / Code│
                   └─────────────┬──────────┘
                                 │
              ┌──────────────────┼──────────────────┐
              ▼                  ▼                  ▼
-      PDF/DOCX/TXT         Text Analysis      Code Analysis
-      Extraction              Service            Service
+      Document Pipeline    Text Analysis      Code Analysis
+      ─────────────────
+      PDF/DOCX/TXT/MD/CSV
+      Text Extraction
+      Recursive Chunking
+      SentenceTransformer
+       Embeddings (MiniLM)
+      ChromaDB Indexing
+      Semantic Retrieval
              │
-             ▼
-   Recursive Text Chunking
-             │
-             ▼
- SentenceTransformer Embeddings
-    (all-MiniLM-L6-v2)
-             │
-             ▼
-      ChromaDB Vector Store
-             │
-             ▼
-      Semantic Similarity Search
-             │
-             ▼
-      Groq LLM (Llama 3.3 70B)
-             │
-             ▼
-     Context-Aware AI Response
-             │
-             ▼
-      Response + Source Chunks
+             └──────────────────┬──────────────────┘
+                                ▼
+                      Groq LLM — Llama 3.3 70B
+                                │
+                                ▼
+                   Context-Aware Response + Sources
+```
 
----------
+---
 
-**🤔 Design Decisions & Trade-offs**
+## Design decisions
 
-Why ChromaDB?
+**Why ChromaDB over Pinecone/Weaviate?**
+Lightweight, zero-infrastructure, and fully local — ideal for a portfolio project where startup time and simplicity matter. Trade-off: not horizontally scalable for enterprise workloads.
 
-* Lightweight local vector database with zero infrastructure overhead.
-* Ideal for rapid development and portfolio projects.
-* Easy persistence without requiring external cloud services.
+**Why `all-MiniLM-L6-v2` over larger embedding models?**
+Fast inference, compact vectors, and strong semantic search quality at a fraction of the compute cost. Trade-off: larger models (e.g. `bge-large`) may improve retrieval precision on technical domains.
 
-Trade-off: Distributed vector databases such as Pinecone or Weaviate offer better scalability for enterprise deployments.
+**Why Groq + Llama 3.3 70B over OpenAI?**
+Sub-second inference latency and no per-token cost ceiling during development. Trade-off: dependent on external API availability and rate limits.
 
-⸻
+**Why `RecursiveCharacterTextSplitter` over fixed-length chunking?**
+Preserves paragraph and sentence boundaries using a hierarchy of separators, with overlap to reduce context fragmentation at chunk edges. This consistently outperforms naive fixed-size slicing on retrieval tasks.
 
-Why SentenceTransformers (all-MiniLM-L6-v2)?
+**Why Streamlit for the frontend?**
+Fastest path from RAG logic to interactive UI — Streamlit's session state integrates cleanly with a chat loop. Trade-off: for production systems, a FastAPI backend + React frontend would offer more control and scalability.
 
-* Fast inference and compact embedding size.
-* Strong semantic search quality for document retrieval.
-* Efficient enough to run locally.
+---
 
-Trade-off: Larger embedding models may improve retrieval quality but require more compute.
+## Features
 
-⸻
+| Feature | Detail |
+|---|---|
+| Multi-format ingestion | PDF, DOCX, TXT, Markdown, CSV |
+| Multi-document reasoning | Ask questions that span across all uploaded files |
+| Semantic search | Vector similarity retrieval — not keyword matching |
+| Source attribution | Responses reference the exact chunks they came from |
+| Text intelligence | Summarize, sentiment, keyword extraction, Q&A |
+| Code intelligence | Explain, debug, improve, generate tests |
+| Chat history | Auto-titled conversations with follow-up context |
+| Error handling | Validation for empty files, bad formats, API failures |
 
-Why Groq + Llama 3.3 70B?
+---
 
-* Very low latency inference.
-* High-quality reasoning capabilities.
-* Simple API integration.
+## Tech stack
 
-Trade-off: Responses depend on external API availability and rate limits.
+| Layer | Technology |
+|---|---|
+| Language | Python 3.10+ |
+| Frontend | Streamlit |
+| LLM | Groq API — Llama 3.3 70B |
+| Embeddings | Sentence Transformers (`all-MiniLM-L6-v2`) |
+| Vector store | ChromaDB |
+| PDF parsing | PyMuPDF |
+| DOCX parsing | python-docx |
+| Text chunking | LangChain `RecursiveCharacterTextSplitter` |
+| Data processing | Pandas |
+| Testing | pytest |
 
-⸻
+---
 
-Why Streamlit?
+## Getting started
 
-* Rapid development of an interactive AI interface.
-* Excellent for demonstrating ML and RAG workflows.
+### Prerequisites
 
-Trade-off: For large production systems, a dedicated frontend with a FastAPI backend may provide greater flexibility and scalability.
+- Python 3.10+
+- A free [Groq API key](https://console.groq.com)
 
-⸻
+### Installation
 
-Why Recursive Character Chunking?
+```bash
+git clone https://github.com/mrpatil1260/query-ai.git
+cd query-ai
 
-* Preserves paragraphs and semantic boundaries.
-* Uses overlap to reduce context fragmentation.
-* Improves retrieval quality compared to fixed-length slicing.
-✨ Features
+python -m venv .venv
+source .venv/bin/activate      # macOS / Linux
+# .venv\Scripts\activate       # Windows
 
---------------------
+pip install -r requirements.txt
+```
 
-**🛡️ Error Handling & Reliability**
+### Configuration
 
-The application includes defensive checks to improve robustness:
+```bash
+cp .env.example .env
+# Add your Groq API key to .env
+```
 
-* Validation for unsupported file formats.
-* Detection of empty or unreadable uploaded documents.
-* Graceful handling of missing retrieval results.
-* Exception handling around LLM inference.
-* Safe processing of multiple uploaded documents.
-* Persistent vector storage using ChromaDB.
-* Source metadata preserved for answer traceability.
-* Session state management for chat continuity.
-* Modular service architecture for easier maintenance and testing.
+```env
+GROQ_API_KEY=your_api_key_here
+```
 
-**📊 Performance & Scalability**
+### Run
 
-Current optimizations:
+```bash
+streamlit run streamlit_app.py
+```
 
-* Model loading is cached to avoid repeated initialization.
-* Embeddings are generated once and reused through vector indexing.
-* Semantic retrieval limits the context sent to the LLM.
-* Multi-document ingestion is supported in a single session.
-* Chunk overlap improves retrieval quality for long documents.
-* Source attribution is maintained for transparency.
+Open [http://localhost:8501](http://localhost:8501)
 
-Potential future enhancements:
+---
 
-* FastAPI REST backend.
-* Hybrid keyword + vector retrieval.
-* Reranking models for improved retrieval precision.
-* Streaming LLM responses.
-* Redis caching.
-* Docker containerization and Kubernetes deployment.
-* User authentication and persistent conversation history.
-* Evaluation pipeline for retrieval quality metrics.
-
--------------
-
-## 🧪 Testing
-
-The project includes unit tests covering core RAG components:
-
-- ✅ Document chunking
-- ✅ Embedding generation
-- ✅ ChromaDB indexing and retrieval
-- ✅ Multi-format file extraction
-- ✅ Text analysis services
-- ✅ Code analysis services
-
-Run all tests:
+## Testing
 
 ```bash
 pytest
+```
 
--------------
+Unit tests cover document chunking, embedding generation, ChromaDB indexing and retrieval, multi-format extraction, text analysis, and code analysis services.
 
-📄 Multi-Format Document Intelligence
+---
 
-Upload one or more documents and interact with them conversationally.
+## Project structure
 
-Supported Formats
-
-* ✅ PDF (.pdf)
-* ✅ Microsoft Word (.docx)
-* ✅ Text (.txt)
-* ✅ Markdown (.md)
-* ✅ CSV (.csv)
-
-Capabilities
-
-* Automatic text extraction
-* Smart document chunking
-* Semantic embeddings generation
-* Vector indexing with ChromaDB
-* AI-powered question answering
-* Multi-document understanding
-* Cross-document comparison
-* Source chunk references
-
-⸻
-
-💬 Unified Chat Interface
-
-Query AI provides a ChatGPT-style conversational experience.
-
-* Ask questions naturally
-* Continue follow-up conversations
-* Maintain context across interactions
-* Automatically generate chat titles
-* Start new conversations with one click
-
-⸻
-
-📝 Text Intelligence
-
-Analyze any pasted text using AI.
-
-Supported actions include:
-
-* Summarization
-* Sentiment Analysis
-* Keyword Extraction
-* Question Answering
-
-⸻
-
-💻 Code Intelligence
-
-Paste source code and receive AI-powered insights.
-
-Supported actions include:
-
-* Explain Code
-* Find Bugs
-* Suggest Improvements
-* Generate Tests
-
-⸻
-
-🔍 Semantic Search
-
-Instead of keyword matching, Query AI retrieves information based on semantic meaning using vector embeddings, enabling more accurate and context-aware responses.
-
-⸻
-
-📚 Multi-Document Support
-
-Upload multiple documents in the same session and ask questions across all of them.
-
-For example:
-
-* Compare two resumes
-* Find differences between reports
-* Identify common topics
-* Ask questions requiring information from multiple files
-
-⸻
-
-🛠️ Tech Stack
-
-Category	Technology
-Language	Python
-Frontend	Streamlit
-LLM	Groq (Llama Models)
-Embeddings	Sentence Transformers (all-MiniLM-L6-v2)
-Vector Database	ChromaDB
-PDF Processing	PyMuPDF
-DOCX Processing	python-docx
-Data Processing	Pandas
-Text Chunking	LangChain RecursiveCharacterTextSplitter
-
-⸻
-
-📂 Project Structure
-
+```
 query-ai/
 │
 ├── app/
-│   ├── components/
-│   ├── services/
-│   ├── api/
-│   └── models/
+│   ├── components/        # Streamlit UI components
+│   ├── services/          # RAG pipeline, text & code analysis
+│   ├── api/               # API layer
+│   └── models/            # Data models
 │
 ├── data/
-│   ├── uploads/
-│   └── chroma_db/
+│   ├── uploads/           # Temporary file storage
+│   └── chroma_db/         # Persistent vector index
 │
-├── streamlit_app.py
+├── tests/                 # pytest unit tests
+├── streamlit_app.py       # App entry point
 ├── requirements.txt
-├── README.md
-└── .env
+├── .env.example
+└── README.md
+```
 
-⸻
+---
 
-User
-  │
-  ▼
-Streamlit UI
-  │
-  ▼
-Document Upload
-  │
-  ▼
-Text Extraction
-  │
-  ▼
-Chunking
-  │
-  ▼
-Embeddings
-  │
-  ▼
-ChromaDB
-  │
-  ▼
-Semantic Retrieval
-  │
-  ▼
-Groq Llama 3.3 70B
-  │
-  ▼
-Final Response
+## Example use cases
 
+- **Resume screening** — Upload 5 resumes, ask "Which candidate has the most Python experience?"
+- **Research synthesis** — Upload 3 papers, ask "What do all these agree on about attention mechanisms?"
+- **Contract review** — Upload a legal PDF, ask "What are the termination clauses?"
+- **CSV exploration** — Upload sales data, ask "Which region had the highest Q3 revenue?"
+- **Code review** — Paste a function, ask "What edge cases does this miss?"
 
-⸻
+---
 
+## Roadmap
 
-⚙️ Installation
+- [ ] FastAPI REST backend (`POST /upload`, `POST /query`)
+- [ ] Hybrid search — BM25 + vector with reciprocal rank fusion
+- [ ] Streaming LLM responses
+- [ ] Reranking with cross-encoder models
+- [ ] Docker + docker-compose setup
+- [ ] Persistent conversation history (SQLite)
+- [ ] Retrieval quality evaluation pipeline
 
-git clone <your-repository-url>
-cd query-ai
-python -m venv .venv
-# macOS / Linux
-source .venv/bin/activate
-# Windows
-.venv\Scripts\activate
-pip install -r requirements.txt
+---
 
-⸻
+## License
 
-🔑 Environment Variables
+MIT — see [LICENSE](LICENSE) for details.
 
-Create a .env file:
+---
 
-GROQ_API_KEY=your_api_key_here
+<div align="center">
 
-⸻
+Built by **[Prasad Patil](https://github.com/mrpatil1260)** · [LinkedIn](https://linkedin.com/in/your-profile)
 
-▶️ Run the Application
+*Demonstrates practical skills in Python, Generative AI, RAG, vector databases, semantic search, and LLM-powered applications.*
 
-streamlit run streamlit_app.py
-
-Then open:
-
-http://localhost:8501
-
-⸻
-
-🚀 Workflow
-
-1. Upload one or more supported documents.
-2. Documents are automatically processed and indexed.
-3. Ask questions in natural language.
-4. Query AI performs semantic retrieval using vector embeddings.
-5. The LLM generates context-aware responses.
-6. Continue the conversation with follow-up questions.
-
-You can also paste text or source code and use the built-in analysis features.
-
-⸻
-
-💡 Example Use Cases
-
-* Resume analysis and comparison
-* Research paper exploration
-* Business document summarization
-* Technical documentation assistance
-* Code explanation and debugging
-* AI-powered text summarization
-* CSV data understanding
-* Knowledge base search
-
-⸻
-
-🌟 Highlights
-
-* ChatGPT-style interface
-* Multi-format document support
-* Multi-document reasoning
-* AI-powered text intelligence
-* AI-powered code intelligence
-* Semantic search with embeddings
-* ChromaDB vector storage
-* Source-aware responses
-* Clean and intuitive Streamlit UI
-
-⸻
-
-📄 License
-
-This project is licensed under the MIT License.
-
-⸻
-
-👨‍💻 Author
-
-Prasad Patil
-
-Built as a portfolio project to demonstrate practical skills in Python, Generative AI, Retrieval-Augmented Generation (RAG), vector databases, semantic search, and LLM-powered applications.
+</div>
